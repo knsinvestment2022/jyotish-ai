@@ -200,19 +200,36 @@ def api_session():
         sess = ChatSession(user_id=current_user.id)
         db.session.add(sess)
 
-    # Update birth details if provided
+    # Update birth details if provided — save to both session AND user profile
     if data.get("birth_name"):
         sess.birth_name = data["birth_name"]
+        current_user.birth_name = data["birth_name"]
     if data.get("birth_date"):
         sess.birth_date = data["birth_date"]
+        current_user.birth_date = data["birth_date"]
     if data.get("birth_time"):
         sess.birth_time = data["birth_time"]
+        current_user.birth_time = data["birth_time"]
     if data.get("birth_place"):
         sess.birth_place = data["birth_place"]
+        current_user.birth_place = data["birth_place"]
 
     # Auto-title from first question or birth name
     if not session_id and sess.birth_name:
         sess.title = f"Reading for {sess.birth_name}"
+
+    # Auto-populate new session from user's saved profile if nothing was provided
+    if not session_id:
+        if not sess.birth_name and current_user.birth_name:
+            sess.birth_name = current_user.birth_name
+        if not sess.birth_date and current_user.birth_date:
+            sess.birth_date = current_user.birth_date
+        if not sess.birth_time and current_user.birth_time:
+            sess.birth_time = current_user.birth_time
+        if not sess.birth_place and current_user.birth_place:
+            sess.birth_place = current_user.birth_place
+        if sess.birth_name and not data.get("birth_name"):
+            sess.title = f"Reading for {sess.birth_name}"
 
     db.session.commit()
     return jsonify({"session_id": sess.id, "title": sess.title})

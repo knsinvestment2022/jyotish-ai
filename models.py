@@ -23,6 +23,12 @@ class User(UserMixin, db.Model):
     beta_expires_at = db.Column(db.DateTime, nullable=True)  # 90 days from signup
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # Saved birth profile — auto-filled into every new chat session
+    birth_name  = db.Column(db.String(100))
+    birth_date  = db.Column(db.String(20))   # "YYYY-MM-DD"
+    birth_time  = db.Column(db.String(10))   # "HH:MM"
+    birth_place = db.Column(db.String(200))
+
     sessions = db.relationship("ChatSession", back_populates="user", lazy=True)
 
     def set_password(self, password: str):
