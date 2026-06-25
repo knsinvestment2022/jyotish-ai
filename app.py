@@ -55,6 +55,9 @@ app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-change-in-production")
 
 # Database
 DB_PATH = os.environ.get("DATABASE_URL", f"sqlite:///{os.path.join(os.path.dirname(__file__), 'astro.db')}")
+# Render provides postgres:// but SQLAlchemy requires postgresql://
+if DB_PATH.startswith("postgres://"):
+    DB_PATH = DB_PATH.replace("postgres://", "postgresql://", 1)
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_PATH
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
@@ -128,7 +131,7 @@ def signup():
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
-            login_user(user)
+            login_user(user, remember=True)
             flash(
                 "Welcome! You have free beta access for 90 days — ask anything." if is_beta
                 else f"Account created! You have {FREE_MESSAGE_LIMIT} free messages.",
@@ -153,7 +156,7 @@ def login():
         if not user or not user.check_password(password):
             error = "Invalid email or password."
         else:
-            login_user(user)
+            login_user(user, remember=True)
             next_page = request.args.get("next")
             return redirect(next_page or url_for("chat_page"))
 
