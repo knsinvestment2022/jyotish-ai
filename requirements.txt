@@ -1,0 +1,16 @@
+flask
+flask-sqlalchemy
+python-dotenv
+flask-login
+werkzeug
+stripe
+pyswisseph
+timezonefinder
+pytz
+requests
+reportlab
+gunicorn
+anthropic
+chromadb
+sentence-transformers
+pypdf
