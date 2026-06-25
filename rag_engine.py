@@ -15,6 +15,14 @@ def _get_collection():
     global _collection
     if _collection is not None:
         return _collection
+
+    # Skip heavy ML imports if chroma_db doesn't exist on this machine.
+    # On Render (free tier) the index is not deployed — return None immediately
+    # so we skip loading sentence-transformers (~400MB) and avoid OOM.
+    if not CHROMA_DIR.exists():
+        print("[RAG] chroma_db not found — running without RAG context")
+        return None
+
     try:
         import chromadb
         from chromadb.utils import embedding_functions

@@ -12,6 +12,4 @@ reportlab
 gunicorn
 psycopg2-binary
 anthropic
-chromadb
-sentence-transformers
 pypdf
