@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: jyotish-ai
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SECRET_KEY
+        value: jyotish-ai-secret-7f3k9p2x8m4n6q1r
+      - key: ADMIN_EMAIL
+        value: knsinvestment2022@gmail.com
+      - key: FREE_MESSAGE_LIMIT
+        value: "20"
+      - key: BETA_USER_LIMIT
+        value: "100"
+      - key: ASTRO_MODEL
+        value: claude-haiku-4-5-20251001
+      - key: PYTHON_VERSION
+        value: "3.11.0"
