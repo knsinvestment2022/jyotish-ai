@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Your Full Reading{% endblock %}
+{% block content %}
+  <h1>Your Full Vedic Reading</h1>
+  <p class="muted">Prepared for {{ birth.name }}</p>
+
+  {% for sec in sections %}
+    <div class="section-title">{{ sec.title }}</div>
+    <p>{{ sec.body }}</p>
+  {% endfor %}
+
+  <a class="btn" href="/reading.pdf?session_id={{ session_id }}">Download as PDF</a>
+{% endblock %}

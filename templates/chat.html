@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jyotish AI — Chat</title>
+  <style>
+    :root {
+      --accent: #1F4E79; --accent-light: #2E75B6; --gold: #C9A84C;
+      --bg: #F0F4F8; --text: #1a1a1a; --muted: #6b7280;
+      --sidebar-w: 260px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+           background: var(--bg); color: var(--text); height: 100vh; display: flex; overflow: hidden; }
+
+    /* ---- SIDEBAR ---- */
+    .sidebar {
+      width: var(--sidebar-w); background: #0f2f52; color: white;
+      display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .sidebar-header { padding: 18px 16px 14px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .logo { font-size: 18px; font-weight: 800; color: white; }
+    .logo span { color: var(--gold); }
+    .new-chat-btn {
+      display: block; margin: 12px 12px 0; background: var(--gold); color: #1a1a1a;
+      border: none; padding: 9px 14px; border-radius: 8px; font-size: 13px;
+      font-weight: 700; cursor: pointer; text-align: center; width: calc(100% - 24px);
+    }
+    .new-chat-btn:hover { opacity: 0.9; }
+    .sidebar-sessions { flex: 1; overflow-y: auto; padding: 10px 8px; }
+    .session-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+                     color: rgba(255,255,255,0.4); padding: 8px 8px 4px; text-transform: uppercase; }
+    .session-item {
+      padding: 9px 10px; border-radius: 7px; cursor: pointer; font-size: 13px;
+      color: rgba(255,255,255,0.75); white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; margin-bottom: 2px;
+    }
+    .session-item:hover { background: rgba(255,255,255,0.1); color: white; }
+    .session-item.active { background: rgba(255,255,255,0.15); color: white; }
+    .sidebar-footer {
+      padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 12px; color: rgba(255,255,255,0.5);
+    }
+    .sidebar-footer .user-name { color: white; font-weight: 600; font-size: 13px; }
+    .sidebar-footer a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 11px; }
+    .sidebar-footer a:hover { color: white; }
+    .msg-counter { font-size: 11px; color: var(--gold); margin-top: 3px; }
+
+    /* ---- MAIN AREA ---- */
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+    /* Top bar */
+    .topbar {
+      background: white; padding: 12px 20px; border-bottom: 1px solid #e5e7eb;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .topbar-title { font-size: 15px; font-weight: 700; color: var(--accent); }
+    .birth-toggle {
+      background: #EBF2FB; color: var(--accent); border: none; padding: 7px 14px;
+      border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .birth-toggle:hover { background: #d6e4f5; }
+
+    /* Birth details panel */
+    .birth-panel {
+      background: white; border-bottom: 1px solid #e5e7eb; padding: 14px 20px;
+      display: none; gap: 12px; flex-wrap: wrap; align-items: flex-end;
+    }
+    .birth-panel.open { display: flex; }
+    .birth-field { display: flex; flex-direction: column; gap: 4px; min-width: 130px; flex: 1; }
+    .birth-field label { font-size: 11px; font-weight: 600; color: var(--muted); }
+    .birth-field input { padding: 7px 10px; border: 1.5px solid #e5e7eb; border-radius: 6px;
+                         font-size: 13px; outline: none; }
+    .birth-field input:focus { border-color: var(--accent); }
+    .birth-save { background: var(--accent); color: white; border: none; padding: 9px 18px;
+                  border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .birth-save:hover { opacity: 0.9; }
+    .birth-status { font-size: 11px; color: #166534; font-weight: 600; margin-left: 8px; }
+
+    /* Messages */
+    .messages { flex: 1; overflow-y: auto; padding: 24px 20px; display: flex; flex-direction: column; gap: 18px; }
+
+    .welcome { text-align: center; padding: 40px 20px; }
+    .welcome h2 { font-size: 22px; font-weight: 800; color: var(--accent); margin-bottom: 8px; }
+    .welcome p { color: var(--muted); font-size: 15px; max-width: 480px; margin: 0 auto 24px; line-height: 1.6; }
+    .sample-qs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .sample-q {
+      background: white; border: 1.5px solid #e5e7eb; color: var(--accent);
+      padding: 9px 15px; border-radius: 20px; font-size: 13px; cursor: pointer;
+      font-weight: 500;
+    }
+    .sample-q:hover { border-color: var(--accent); background: #EBF2FB; }
+
+    .msg-row { display: flex; gap: 10px; }
+    .msg-row.user { justify-content: flex-end; }
+    .msg-row.assistant { justify-content: flex-start; }
+
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+      font-weight: 700; margin-top: 2px;
+    }
+    .avatar.ai { background: var(--accent); color: white; }
+    .avatar.user { background: var(--gold); color: #1a1a1a; }
+
+    .bubble {
+      max-width: 72%; padding: 12px 16px; border-radius: 14px;
+      font-size: 14px; line-height: 1.65;
+    }
+    .bubble.user { background: var(--accent); color: white; border-bottom-right-radius: 4px; }
+    .bubble.assistant { background: white; color: var(--text); border-bottom-left-radius: 4px;
+                        box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+    .bubble.assistant p { margin-bottom: 8px; }
+    .bubble.assistant p:last-child { margin-bottom: 0; }
+    .bubble.assistant strong { color: var(--accent); }
+
+    .feedback-row { display: flex; gap: 6px; margin-top: 6px; margin-left: 42px; align-items: center; }
+    .fb-btn {
+      background: none; border: 1px solid #e5e7eb; border-radius: 6px; padding: 3px 8px;
+      cursor: pointer; font-size: 13px; color: var(--muted);
+    }
+    .fb-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .fb-btn.active-up { border-color: #16a34a; color: #16a34a; background: #f0fdf4; }
+    .fb-btn.active-down { border-color: #dc2626; color: #dc2626; background: #fef2f2; }
+    .fb-comment { display: none; margin-top: 6px; margin-left: 42px; }
+    .fb-comment input {
+      padding: 6px 10px; border: 1px solid #e5e7eb; border-radius: 6px;
+      font-size: 12px; width: 280px; outline: none;
+    }
+    .fb-comment button { background: var(--accent); color: white; border: none;
+                         padding: 6px 12px; border-radius: 6px; font-size: 12px;
+                         cursor: pointer; margin-left: 6px; }
+
+    .typing { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+    .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent);
+                  animation: bounce 1.2s infinite; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+
+    /* Input area */
+    .input-area {
+      background: white; padding: 16px 20px; border-top: 1px solid #e5e7eb;
+    }
+    .input-row { display: flex; gap: 10px; max-width: 900px; margin: 0 auto; }
+    .input-box {
+      flex: 1; padding: 11px 14px; border: 1.5px solid #e5e7eb; border-radius: 10px;
+      font-size: 14px; font-family: inherit; outline: none; resize: none;
+      max-height: 120px; line-height: 1.5;
+    }
+    .input-box:focus { border-color: var(--accent); }
+    .send-btn {
+      background: var(--accent); color: white; border: none; padding: 11px 18px;
+      border-radius: 10px; font-size: 16px; cursor: pointer; align-self: flex-end;
+    }
+    .send-btn:hover { background: var(--accent-light); }
+    .send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .input-hint { text-align: center; font-size: 11px; color: var(--muted); margin-top: 8px; }
+
+    /* Limit warning */
+    .limit-bar {
+      background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px;
+      padding: 10px 16px; font-size: 13px; color: #78350f; text-align: center;
+      margin: 0 20px 12px;
+    }
+    .limit-bar a { color: var(--accent); font-weight: 700; }
+
+    /* Mobile */
+    @media (max-width: 640px) {
+      .sidebar { display: none; }
+      .bubble { max-width: 88%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">Jyotish <span>AI</span></div>
+  </div>
+  <button class="new-chat-btn" onclick="newChat()">+ New Reading</button>
+  <div class="sidebar-sessions">
+    {% if sessions %}
+    <div class="session-label">Recent Readings</div>
+    {% for s in sessions %}
+    <div class="session-item" onclick="loadSession({{ s.id }})" id="sess-{{ s.id }}">
+      {{ s.title or 'Reading' }}
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+  <div class="sidebar-footer">
+    <div class="user-name">{{ user.name }}</div>
+    <div>{{ user.email }}</div>
+    {% if user.beta_active %}
+    <div class="msg-counter">✦ Beta access — {{ user.beta_days_left }} days left</div>
+    {% else %}
+    <div class="msg-counter">{{ user.messages_remaining }} messages remaining</div>
+    {% endif %}
+    <div style="margin-top:8px;">
+      <a href="/logout">Sign out</a> ·
+      <a href="/">Home</a>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-title" id="chat-title">New Reading</div>
+    <button class="birth-toggle" onclick="toggleBirth()">✦ Birth Details</button>
+  </div>
+
+  <!-- Birth panel -->
+  <div class="birth-panel" id="birth-panel">
+    <div class="birth-field">
+      <label>Name</label>
+      <input type="text" id="b-name" placeholder="Arjun">
+    </div>
+    <div class="birth-field">
+      <label>Date of Birth</label>
+      <input type="date" id="b-date">
+    </div>
+    <div class="birth-field">
+      <label>Birth Time</label>
+      <input type="time" id="b-time">
+    </div>
+    <div class="birth-field" style="flex: 2; min-width: 200px;">
+      <label>Birth Place (city, country)</label>
+      <input type="text" id="b-place" placeholder="Delhi, India">
+    </div>
+    <button class="birth-save" onclick="saveBirth()">Save</button>
+    <span class="birth-status" id="birth-status"></span>
+  </div>
+
+  <!-- Messages -->
+  <div class="messages" id="messages">
+    <div class="welcome" id="welcome">
+      <h2>Welcome, {{ user.name }} 🙏</h2>
+      <p>Ask any Vedic astrology question. For a personal reading, first enter your birth details above.</p>
+      <div class="sample-qs">
+        <div class="sample-q" onclick="sendSample(this)">What does Venus Mahadasha mean for me?</div>
+        <div class="sample-q" onclick="sendSample(this)">When will I get a job?</div>
+        <div class="sample-q" onclick="sendSample(this)">What is Hamsa Yoga?</div>
+        <div class="sample-q" onclick="sendSample(this)">Will my green card be approved?</div>
+        <div class="sample-q" onclick="sendSample(this)">What is Kala Sarpa Yoga?</div>
+        <div class="sample-q" onclick="sendSample(this)">Best days this week to invest in stocks?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Limit warning -->
+  {% if not user.is_beta and user.messages_remaining < 5 %}
+  <div class="limit-bar">
+    You have {{ user.messages_remaining }} free messages left.
+    <a href="/upgrade">Upgrade to Pro →</a>
+  </div>
+  {% endif %}
+
+  <!-- Input -->
+  <div class="input-area">
+    <div class="input-row">
+      <textarea class="input-box" id="input" placeholder="Ask any astrology question..."
+                rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+    <div class="input-hint">Answers drawn from 21 classical Vedic texts · Enter or click ➤ to send</div>
+  </div>
+</div>
+
+<script>
+  let currentSessionId = null;
+  let isLoading = false;
+
+  // ---- Birth details ----
+  function toggleBirth() {
+    const panel = document.getElementById('birth-panel');
+    panel.classList.toggle('open');
+  }
+
+  async function saveBirth() {
+    const data = {
+      session_id: currentSessionId,
+      birth_name: document.getElementById('b-name').value,
+      birth_date: document.getElementById('b-date').value,
+      birth_time: document.getElementById('b-time').value,
+      birth_place: document.getElementById('b-place').value,
+    };
+    const res = await fetch('/api/session', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (json.session_id) {
+      currentSessionId = json.session_id;
+      document.getElementById('birth-status').textContent = '✓ Saved';
+      document.getElementById('chat-title').textContent = json.title || 'Personal Reading';
+      setTimeout(() => {
+        document.getElementById('birth-status').textContent = '';
+        document.getElementById('birth-panel').classList.remove('open');
+      }, 1500);
+    }
+  }
+
+  // ---- Send message ----
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function sendSample(el) {
+    document.getElementById('input').value = el.textContent;
+    sendMessage();
+  }
+
+  async function sendMessage() {
+    if (isLoading) return;
+    const input = document.getElementById('input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    // Hide welcome
+    const welcome = document.getElementById('welcome');
+    if (welcome) welcome.style.display = 'none';
+
+    // Add user bubble
+    addBubble('user', text);
+    input.value = '';
+    input.style.height = 'auto';
+
+    // Show typing
+    const typingId = addTyping();
+    isLoading = true;
+    document.getElementById('send-btn').disabled = true;
+
+    try {
+      let fullResponse = '';
+      let messageId = null;
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          message: text,
+          session_id: currentSessionId,
+          stream: true,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        removeTyping(typingId);
+        if (err.upgrade) {
+          addBubble('assistant', '⚠️ ' + err.error + ' <a href="/upgrade" style="color:#1F4E79;font-weight:700;">Upgrade to Pro →</a>');
+        } else {
+          addBubble('assistant', '❌ ' + (err.error || 'Something went wrong.'));
+        }
+        return;
+      }
+
+      // Remove typing, add streaming bubble
+      removeTyping(typingId);
+      const { bubbleEl, textEl } = addStreamBubble();
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.type === 'start' && data.session_id) {
+              currentSessionId = data.session_id;
+            } else if (data.type === 'chunk') {
+              fullResponse += data.text;
+              textEl.innerHTML = formatMarkdown(fullResponse);
+              scrollBottom();
+            } else if (data.type === 'done') {
+              messageId = data.message_id;
+            }
+          } catch (e) {}
+        }
+      }
+
+      // Add feedback buttons
+      if (messageId) {
+        addFeedback(bubbleEl, messageId);
+      }
+
+    } catch (err) {
+      removeTyping(typingId);
+      addBubble('assistant', '❌ Network error. Please try again.');
+    } finally {
+      isLoading = false;
+      document.getElementById('send-btn').disabled = false;
+      input.focus();
+    }
+  }
+
+  // ---- DOM helpers ----
+  function addBubble(role, html) {
+    const msgs = document.getElementById('messages');
+    const row = document.createElement('div');
+    row.className = 'msg-row ' + role;
+
+    if (role === 'assistant') {
+      row.innerHTML = `
+        <div class="avatar ai">★</div>
+        <div class="bubble assistant">${formatMarkdown(html)}</div>`;
+    } else {
+      row.innerHTML = `
+        <div class="bubble user">${escapeHtml(html)}</div>
+        <div class="avatar user">{{ user.name[0] | upper }}</div>`;
+    }
+    msgs.appendChild(row);
+    scrollBottom();
+    return row;
+  }
+
+  function addStreamBubble() {
+    const msgs = document.getElementById('messages');
+    const row = document.createElement('div');
+    row.className = 'msg-row assistant';
+    const textEl = document.createElement('div');
+    textEl.className = 'bubble assistant';
+    row.innerHTML = '<div class="avatar ai">★</div>';
+    row.appendChild(textEl);
+    msgs.appendChild(row);
+    scrollBottom();
+    return { bubbleEl: row, textEl };
+  }
+
+  function addTyping() {
+    const msgs = document.getElementById('messages');
+    const id = 'typing-' + Date.now();
+    const row = document.createElement('div');
+    row.className = 'msg-row assistant';
+    row.id = id;
+    row.innerHTML = `<div class="avatar ai">★</div>
+      <div class="bubble assistant">
+        <div class="typing">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>`;
+    msgs.appendChild(row);
+    scrollBottom();
+    return id;
+  }
+
+  function removeTyping(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  }
+
+  function addFeedback(bubbleEl, messageId) {
+    const fbRow = document.createElement('div');
+    fbRow.className = 'feedback-row';
+    fbRow.id = 'fb-' + messageId;
+    fbRow.innerHTML = `
+      <span style="font-size:11px;color:#9ca3af;">Helpful?</span>
+      <button class="fb-btn" onclick="submitFeedback(${messageId}, 5, this)">👍</button>
+      <button class="fb-btn" onclick="submitFeedback(${messageId}, 1, this)">👎</button>`;
+    bubbleEl.parentNode.insertBefore(fbRow, bubbleEl.nextSibling);
+
+    const commentDiv = document.createElement('div');
+    commentDiv.className = 'fb-comment';
+    commentDiv.id = 'fbc-' + messageId;
+    commentDiv.innerHTML = `
+      <input type="text" placeholder="Any comments? (optional)" id="fbt-${messageId}">
+      <button onclick="submitComment(${messageId})">Send</button>`;
+    fbRow.parentNode.insertBefore(commentDiv, fbRow.nextSibling);
+  }
+
+  async function submitFeedback(messageId, rating, btn) {
+    const row = document.getElementById('fb-' + messageId);
+    row.querySelectorAll('.fb-btn').forEach(b => b.classList.remove('active-up', 'active-down'));
+    btn.classList.add(rating >= 4 ? 'active-up' : 'active-down');
+
+    const comment = document.getElementById('fbt-' + messageId)?.value || '';
+    await fetch('/api/feedback', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ message_id: messageId, rating, comment }),
+    });
+
+    // Show comment box for thumbs down
+    if (rating === 1) {
+      const cd = document.getElementById('fbc-' + messageId);
+      if (cd) cd.style.display = 'block';
+    }
+  }
+
+  async function submitComment(messageId) {
+    const input = document.getElementById('fbt-' + messageId);
+    const rating = document.querySelector('#fb-' + messageId + ' .active-down') ? 1 : 5;
+    await fetch('/api/feedback', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ message_id: messageId, rating, comment: input.value }),
+    });
+    const cd = document.getElementById('fbc-' + messageId);
+    if (cd) cd.style.display = 'none';
+  }
+
+  // ---- Load session ----
+  async function loadSession(sessionId) {
+    document.querySelectorAll('.session-item').forEach(el => el.classList.remove('active'));
+    const el = document.getElementById('sess-' + sessionId);
+    if (el) el.classList.add('active');
+
+    currentSessionId = sessionId;
+    const res = await fetch('/api/sessions/' + sessionId + '/messages');
+    const data = await res.json();
+
+    document.getElementById('chat-title').textContent = data.title || 'Reading';
+
+    // Fill birth fields
+    if (data.birth.name) document.getElementById('b-name').value = data.birth.name;
+    if (data.birth.date) document.getElementById('b-date').value = data.birth.date;
+    if (data.birth.time) document.getElementById('b-time').value = data.birth.time;
+    if (data.birth.place) document.getElementById('b-place').value = data.birth.place;
+
+    // Render messages
+    const msgs = document.getElementById('messages');
+    msgs.innerHTML = '';
+    for (const m of data.messages) {
+      addBubble(m.role, m.content);
+    }
+  }
+
+  function newChat() {
+    currentSessionId = null;
+    document.getElementById('messages').innerHTML = '';
+    document.getElementById('chat-title').textContent = 'New Reading';
+    document.getElementById('b-name').value = '';
+    document.getElementById('b-date').value = '';
+    document.getElementById('b-time').value = '';
+    document.getElementById('b-place').value = '';
+    document.querySelectorAll('.session-item').forEach(el => el.classList.remove('active'));
+
+    // Re-add welcome
+    const welcome = document.createElement('div');
+    welcome.className = 'welcome';
+    welcome.id = 'welcome';
+    welcome.innerHTML = `
+      <h2>New Reading 🙏</h2>
+      <p>Enter your birth details above for a personal reading, or ask any general Vedic astrology question.</p>`;
+    document.getElementById('messages').appendChild(welcome);
+  }
+
+  // ---- Utilities ----
+  function scrollBottom() {
+    const msgs = document.getElementById('messages');
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function escapeHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function formatMarkdown(text) {
+    return text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      .replace(/`(.+?)`/g, '<code style="background:#f0f4f8;padding:1px 4px;border-radius:3px;">$1</code>')
+      .replace(/\n\n/g, '</p><p>')
+      .replace(/\n/g, '<br>')
+      .replace(/^/, '<p>')
+      .replace(/$/, '</p>');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Users — Jyotish AI Admin</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f8fafc; padding: 32px; }
+    h1 { color: #1F4E79; margin-bottom: 24px; }
+    .stats { display: flex; gap: 16px; margin-bottom: 32px; }
+    .stat { background: white; border-radius: 10px; padding: 20px 24px; min-width: 140px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .stat .n { font-size: 32px; font-weight: 800; color: #1F4E79; }
+    .stat .l { font-size: 12px; color: #6b7280; margin-top: 4px; }
+    table { width: 100%; border-collapse: collapse; background: white;
+            border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    th { background: #1F4E79; color: white; padding: 11px 14px; text-align: left; font-size: 13px; }
+    td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #f0f4f8; }
+    tr:last-child td { border-bottom: none; }
+    .badge { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+    .beta { background: #dcfce7; color: #166534; }
+    .free { background: #f0f4f8; color: #374151; }
+    .pro { background: #fef3c7; color: #78350f; }
+    a { color: #1F4E79; }
+  </style>
+</head>
+<body>
+<h1>All Users</h1>
+
+<div class="stats">
+  <div class="stat"><div class="n">{{ users|length }}</div><div class="l">Total Users</div></div>
+  <div class="stat"><div class="n">{{ users|selectattr('is_beta')|list|length }}</div><div class="l">Beta Users</div></div>
+  <div class="stat"><div class="n">{{ users|selectattr('plan', 'equalto', 'pro')|list|length }}</div><div class="l">Pro Users</div></div>
+  <div class="stat"><div class="n">{{ users|sum(attribute='message_count') }}</div><div class="l">Total Messages</div></div>
+</div>
+
+<table>
+  <tr>
+    <th>#</th><th>Name</th><th>Email</th><th>Plan</th><th>Messages</th><th>Joined</th>
+  </tr>
+  {% for u in users %}
+  <tr>
+    <td>{{ u.id }}</td>
+    <td>{{ u.name }}</td>
+    <td>{{ u.email }}</td>
+    <td>
+      {% if u.is_beta %}<span class="badge beta">Beta</span>
+      {% elif u.plan == 'pro' %}<span class="badge pro">Pro</span>
+      {% else %}<span class="badge free">Free</span>{% endif %}
+    </td>
+    <td>{{ u.message_count }}</td>
+    <td>{{ u.created_at.strftime('%b %d, %Y') }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:40px;">No users yet.</td></tr>
+  {% endfor %}
+</table>
+<p style="margin-top:20px;color:#9ca3af;font-size:13px;">
+  <a href="/admin/feedback">View feedback →</a>
+</p>
+</body>
+</html>

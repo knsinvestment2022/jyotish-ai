@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Your Free Preview{% endblock %}
+{% block content %}
+  <h1>Your Free Preview</h1>
+  <p class="muted">Based on: {{ display_name }}</p>
+
+  <h2>Ascendant: {{ teaser.lagna_sign }}</h2>
+  <h2>Moon: {{ teaser.moon_sign }} ({{ teaser.moon_nakshatra }})</h2>
+  <p>{{ teaser.teaser_text }}</p>
+
+  <form method="POST" action="/checkout">
+    <input type="hidden" name="name" value="{{ birth.name }}">
+    <input type="hidden" name="year" value="{{ birth.year }}">
+    <input type="hidden" name="month" value="{{ birth.month }}">
+    <input type="hidden" name="day" value="{{ birth.day }}">
+    <input type="hidden" name="hour" value="{{ birth.hour }}">
+    <input type="hidden" name="minute" value="{{ birth.minute }}">
+    <input type="hidden" name="place" value="{{ birth.place }}">
+    <button type="submit">Unlock Full Reading -- {{ currency }} {{ price_display }}</button>
+  </form>
+  <p class="muted"><a href="/">&larr; Start over</a></p>
+{% endblock %}

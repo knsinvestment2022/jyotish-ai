@@ -12,15 +12,267 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
            background: var(--bg); color: var(--text); }
+
+    /* NAV */
     nav { background: var(--accent); padding: 14px 32px; display: flex;
           justify-content: space-between; align-items: center; }
-    nav .logo { color: white; font-size: 20px; font-weight: 700; }
+    nav .logo { color: white; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
     nav .logo span { color: var(--gold); }
-    nav a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 14px; font-weight: 500; margin-left: 20px; }
-    nav a.btn-nav { background: var(--gold); color: #1a1a1a; padding: 8px 18px; border-radius: 6px; font-weight: 700; }
+    nav a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 14px;
+            font-weight: 500; margin-left: 20px; }
+    nav a.btn-nav { background: var(--gold); color: #1a1a1a; padding: 8px 18px;
+                    border-radius: 6px; font-weight: 700; }
+    nav a.btn-nav:hover { opacity: 0.9; }
+
+    /* HERO */
+    .hero { background: linear-gradient(135deg, #0f2f52 0%, #1F4E79 60%, #2E75B6 100%);
+            color: white; text-align: center; padding: 80px 20px 70px; }
+    .hero .tag { display: inline-block; background: rgba(201,168,76,0.2);
+                 border: 1px solid var(--gold); color: var(--gold);
+                 padding: 5px 14px; border-radius: 20px; font-size: 12px;
+                 font-weight: 600; letter-spacing: 0.06em; margin-bottom: 20px; }
+    .hero h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 800;
+               line-height: 1.15; max-width: 740px; margin: 0 auto 18px; }
+    .hero h1 em { color: var(--gold); font-style: normal; }
+    .hero p { font-size: 18px; color: rgba(255,255,255,0.8); max-width: 560px;
+              margin: 0 auto 36px; line-height: 1.6; }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { background: var(--gold); color: #1a1a1a; padding: 14px 32px;
+                   border-radius: 8px; font-size: 16px; font-weight: 700;
+                   text-decoration: none; display: inline-block; }
+    .btn-primary:hover { opacity: 0.92; }
+    .btn-outline { border: 2px solid rgba(255,255,255,0.4); color: white;
+                   padding: 13px 28px; border-radius: 8px; font-size: 16px;
+                   font-weight: 600; text-decoration: none; display: inline-block; }
+    .btn-outline:hover { border-color: white; }
+    .hero-note { margin-top: 22px; font-size: 13px; color: rgba(255,255,255,0.55); }
+
+    /* DEMO Q&A */
+    .demo { max-width: 720px; margin: -30px auto 0; padding: 0 20px; position: relative; z-index: 2; }
+    .demo-card { background: white; border-radius: 16px; box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+                 overflow: hidden; }
+    .demo-header { background: var(--accent); color: white; padding: 12px 20px;
+                   font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .demo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+    .demo-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .bubble { max-width: 85%; padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.55; }
+    .bubble.user { align-self: flex-end; background: var(--accent); color: white; border-bottom-right-radius: 4px; }
+    .bubble.ai { align-self: flex-start; background: #f0f4f8; color: var(--text); border-bottom-left-radius: 4px; }
+
+    /* FEATURES */
+    .section { padding: 70px 20px; max-width: 1000px; margin: 0 auto; }
+    .section-title { text-align: center; font-size: 28px; font-weight: 800;
+                     color: var(--accent); margin-bottom: 10px; }
+    .section-sub { text-align: center; color: var(--muted); font-size: 16px;
+                   max-width: 520px; margin: 0 auto 48px; line-height: 1.6; }
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+    .feature { background: white; border-radius: 12px; padding: 24px;
+               box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .feature .icon { font-size: 28px; margin-bottom: 12px; }
+    .feature h3 { font-size: 16px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+    .feature p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* HOW IT WORKS */
+    .steps { background: white; padding: 70px 20px; }
+    .steps-inner { max-width: 800px; margin: 0 auto; }
+    .step-row { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 32px; }
+    .step-num { min-width: 44px; height: 44px; border-radius: 50%; background: var(--accent);
+                color: white; font-size: 18px; font-weight: 800; display: flex;
+                align-items: center; justify-content: center; }
+    .step-text h3 { font-size: 17px; font-weight: 700; color: var(--accent); margin-bottom: 5px; }
+    .step-text p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* BOOKS */
+    .books { padding: 60px 20px; max-width: 900px; margin: 0 auto; }
+    .book-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+    .book-tag { background: #EBF2FB; color: var(--accent); padding: 6px 12px;
+                border-radius: 20px; font-size: 12px; font-weight: 600; }
+
+    /* SIGNUP SECTION */
+    .signup-section { background: linear-gradient(135deg, #0f2f52, #1F4E79);
+                      padding: 70px 20px; text-align: center; color: white; }
+    .signup-section h2 { font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+    .signup-section p { color: rgba(255,255,255,0.75); font-size: 16px; margin-bottom: 36px; }
+    .signup-form { background: white; max-width: 440px; margin: 0 auto;
+                   border-radius: 14px; padding: 32px; text-align: left; }
+    .signup-form h3 { color: var(--accent); font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; margin-top: 14px; }
+    input[type="text"], input[type="email"], input[type="password"] {
+      width: 100%; padding: 10px 12px; border: 1.5px solid #D8DCE2;
+      border-radius: 8px; font-size: 15px; outline: none; }
+    input:focus { border-color: var(--accent); }
+    .btn-submit { width: 100%; background: var(--accent); color: white; border: none;
+                  padding: 13px; border-radius: 8px; font-size: 16px; font-weight: 700;
+                  cursor: pointer; margin-top: 20px; }
+    .btn-submit:hover { background: var(--accent-light); }
+    .already { text-align: center; margin-top: 14px; font-size: 13px; color: var(--muted); }
+    .already a { color: var(--accent); font-weight: 600; text-decoration: none; }
+    .beta-badge { background: #dcfce7; color: #166534; padding: 6px 12px; border-radius: 6px;
+                  font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 14px; }
+
+    /* FOOTER */
+    footer { background: #0f2f52; color: rgba(255,255,255,0.5); text-align: center;
+             padding: 24px; font-size: 13px; }
   </style>
 </head>
 <body>
-<p>Jyotish AI - Landing Page (full content in repository)</p>
+
+<nav>
+  <div class="logo">Jyotish <span>AI</span></div>
+  <div>
+    <a href="/login">Sign in</a>
+    <a href="/signup" class="btn-nav">Get Free Access</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="tag">✦ BETA — First 100 users get 90 days free access</div>
+  <h1>Ask Any Astrology Question.<br><em>Get Answers from a Vedic Astrology Expert.</em></h1>
+  <p>Powered by deep knowledge of Parashari, KP, Ashtakvarga, Varshphal, Jaimini and Nadi systems — giving you the precision of a real Jyotishi.</p>
+  <div class="hero-btns">
+    <a href="/signup" class="btn-primary">Start for Free →</a>
+    <a href="#how-it-works" class="btn-outline">See How It Works</a>
+  </div>
+  <div class="hero-note">No credit card required · First 100 users get 90 days free</div>
+</div>
+
+<!-- DEMO CHAT -->
+<div class="demo">
+  <div class="demo-card">
+    <div class="demo-header">
+      <div class="demo-dot"></div>
+      Jyotish AI — Live Example
+    </div>
+    <div class="demo-body">
+      <div class="bubble user">Will I get a job soon? I'm in Venus Mahadasha.</div>
+      <div class="bubble ai">
+        Venus as Mahadasha lord is extremely significant for career. Venus rules your H11 (gains and fulfillment of desires) — meaning this 20-year period is fundamentally about income growth. The key window I see: when Mars becomes the Pratyantardasha lord within Venus AD, your H10 (career house) gets directly activated. Jupiter transiting your H2 (income) at that point creates a classic job-offer combination. The most precise window: <strong>November 2026 through January 2027</strong>, with a backup window of July–December 2027 when Jupiter's own PD activates H6 (employment) in H10.
+      </div>
+      <div class="bubble user">What about my green card chances?</div>
+      <div class="bubble ai">
+        Rahu in your H4 (citizenship/home) is a natal signature of foreign settlement — this was written into your chart from birth. The H12 lord (foreign lands) sitting in H11 (fulfillment) is one of the best placements for immigration turning into permanent gain. The current Venus Antardasha (runs through March 2029) rules both H4 and H11 simultaneously, making this the most favorable 3-year window for approval.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="section">
+  <div class="section-title">Why Jyotish AI is Different</div>
+  <div class="section-sub">Not a generic horoscope app. Built with deep knowledge of classical Vedic systems for layered, precise analysis.</div>
+  <div class="features">
+    <div class="feature">
+      <div class="icon">📚</div>
+      <h3>Classical System Knowledge</h3>
+      <p>Deep mastery of Parashari, KP, Ashtakvarga, Varshphal, Jaimini and Nadi — the complete toolkit of a seasoned Jyotishi, not just sun signs.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🔮</div>
+      <h3>Multi-System Analysis</h3>
+      <p>Parashari + KP + Ashtakvarga + Varshphal + Jaimini + Nadi + Brighu Bindu — layered in the correct order, not cherry-picked.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">⏱️</div>
+      <h3>Precise Timing</h3>
+      <p>Not just "your career will improve" — but "November 2026 through January 2027 is your job window, based on Mars PD activating H10."</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🧠</div>
+      <h3>Remembers Your Chart</h3>
+      <p>Enter your birth details once. Every follow-up question gets answered with full awareness of your natal chart and current dasha period.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">📖</div>
+      <h3>Deep Expert Knowledge</h3>
+      <p>Answers go far beyond basic sun-sign horoscopes — covering yogas, dasha timing, Ashtakvarga transit strength, Jaimini, and Nadi principles.</p>
+    </div>
+    <div class="feature">
+      <div class="icon">🌐</div>
+      <h3>Works for Anyone</h3>
+      <p>Whether you're a complete beginner or an experienced Jyotishi, you can ask questions in plain English and get depth-appropriate answers.</p>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="steps" id="how-it-works">
+  <div class="steps-inner">
+    <div class="section-title">How It Works</div>
+    <div class="section-sub" style="margin-bottom:40px;">Three steps to your first reading</div>
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-text">
+        <h3>Create your free account</h3>
+        <p>Sign up in 30 seconds — no credit card. First 100 users get 90 days of free unlimited access as beta testers.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-text">
+        <h3>Enter your birth details</h3>
+        <p>Name, date, time, and place of birth. The AI computes your full natal chart — lagna, dasha, planetary positions — and remembers it for the whole session.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-text">
+        <h3>Ask anything</h3>
+        <p>Career, love, health, money, immigration, spiritual path, transit timing — anything. Get layered analysis from multiple Vedic systems in seconds.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOPICS -->
+<div class="books">
+  <div class="section-title">What You Can Ask</div>
+  <div class="section-sub">Any Vedic astrology topic — personal, financial, spiritual, or timing</div>
+  <div class="book-grid">
+    <span class="book-tag">Career & Job Timing</span>
+    <span class="book-tag">Marriage & Relationships</span>
+    <span class="book-tag">Foreign Settlement & Immigration</span>
+    <span class="book-tag">Stock Market & Finance</span>
+    <span class="book-tag">Health & Medical Astrology</span>
+    <span class="book-tag">Vimshottari Dasha Analysis</span>
+    <span class="book-tag">Yoga Identification</span>
+    <span class="book-tag">Ashtakvarga Transit Strength</span>
+    <span class="book-tag">Annual Solar Return (Varshphal)</span>
+    <span class="book-tag">KP Sublord Timing</span>
+    <span class="book-tag">Nakshatra & Moon Sign</span>
+    <span class="book-tag">Rahu-Ketu Axis Effects</span>
+    <span class="book-tag">Spiritual Path & Karma</span>
+    <span class="book-tag">Remedy Suggestions</span>
+    <span class="book-tag">Daily & Weekly Forecasts</span>
+    <span class="book-tag">Jaimini System Analysis</span>
+    <span class="book-tag">Kala Sarpa Yoga</span>
+    <span class="book-tag">Sade Sati Guidance</span>
+  </div>
+</div>
+
+<!-- SIGNUP -->
+<div class="signup-section">
+  <h2>Get Free Access Now</h2>
+  <p>Join the beta — first 100 users get 90 days of free unlimited access in exchange for feedback.</p>
+  <div class="signup-form">
+    <div class="beta-badge">🎉 BETA ACCESS — 90 days free for first 100 users</div>
+    <h3>Create your account</h3>
+    <form method="POST" action="/signup">
+      <label>Your name</label>
+      <input type="text" name="name" placeholder="Arjun Sharma" required>
+      <label>Email address</label>
+      <input type="email" name="email" placeholder="you@email.com" required>
+      <label>Password</label>
+      <input type="password" name="password" placeholder="Min. 6 characters" required>
+      <button type="submit" class="btn-submit">Start Free →</button>
+    </form>
+    <div class="already">Already have an account? <a href="/login">Sign in</a></div>
+  </div>
+</div>
+
+<footer>
+  © 2026 Jyotish AI · Vedic Astrology Expert System
+</footer>
+
 </body>
 </html>

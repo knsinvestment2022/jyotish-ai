@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Feedback Dashboard — Jyotish AI</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f8fafc; padding: 32px; }
+    h1 { color: #1F4E79; margin-bottom: 24px; }
+    .stats { display: flex; gap: 16px; margin-bottom: 32px; }
+    .stat { background: white; border-radius: 10px; padding: 20px 24px; min-width: 140px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .stat .n { font-size: 32px; font-weight: 800; color: #1F4E79; }
+    .stat .l { font-size: 12px; color: #6b7280; margin-top: 4px; }
+    table { width: 100%; border-collapse: collapse; background: white;
+            border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    th { background: #1F4E79; color: white; padding: 11px 14px; text-align: left; font-size: 13px; }
+    td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #f0f4f8; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    .good { color: #16a34a; font-weight: 700; }
+    .bad { color: #dc2626; font-weight: 700; }
+    .msg-preview { max-width: 340px; color: #374151; line-height: 1.5; }
+    a { color: #1F4E79; }
+  </style>
+</head>
+<body>
+<h1>Feedback Dashboard</h1>
+
+{% set total = rows|length %}
+{% set good = rows|selectattr('0.rating', '>=', 4)|list|length %}
+{% set bad = rows|selectattr('0.rating', '<=', 2)|list|length %}
+
+<div class="stats">
+  <div class="stat"><div class="n">{{ total }}</div><div class="l">Total Ratings</div></div>
+  <div class="stat"><div class="n good">{{ good }}</div><div class="l">👍 Positive</div></div>
+  <div class="stat"><div class="n bad">{{ bad }}</div><div class="l">👎 Negative</div></div>
+  <div class="stat"><div class="n">{{ "%.0f"|format(good/total*100 if total else 0) }}%</div><div class="l">Satisfaction</div></div>
+</div>
+
+<table>
+  <tr>
+    <th>Rating</th>
+    <th>User</th>
+    <th>AI Response (preview)</th>
+    <th>Comment</th>
+    <th>Date</th>
+  </tr>
+  {% for fb, msg, user in rows %}
+  <tr>
+    <td>{% if fb.rating >= 4 %}<span class="good">👍</span>{% else %}<span class="bad">👎</span>{% endif %}</td>
+    <td>{{ user.name }}<br><small>{{ user.email }}</small></td>
+    <td><div class="msg-preview">{{ msg.content[:200] }}{% if msg.content|length > 200 %}…{% endif %}</div></td>
+    <td>{{ fb.comment or '—' }}</td>
+    <td>{{ fb.created_at.strftime('%b %d %H:%M') }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:40px;">No feedback yet.</td></tr>
+  {% endfor %}
+</table>
+
+<p style="margin-top:20px;color:#9ca3af;font-size:13px;">
+  <a href="/admin/users">View all users →</a>
+</p>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Get Your Free Vedic Astrology Preview{% endblock %}
+{% block content %}
+  <h1>Your Vedic Astrology Reading</h1>
+  <p class="muted">Enter your birth details for a free preview. Unlock the full reading -- career, money, health, and your current planetary period -- for {{ "$9.99" }}.</p>
+
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+  <form method="POST" action="/preview">
+    <label>Your name</label>
+    <input type="text" name="name" placeholder="Optional" />
+
+    <label>Date of birth</label>
+    <div class="row">
+      <div><input type="number" name="day" placeholder="Day" min="1" max="31" required></div>
+      <div><input type="number" name="month" placeholder="Month" min="1" max="12" required></div>
+      <div><input type="number" name="year" placeholder="Year" min="1900" max="2100" required></div>
+    </div>
+
+    <label>Time of birth</label>
+    <div class="row">
+      <div><input type="number" name="hour" placeholder="Hour (0-23)" min="0" max="23" required></div>
+      <div><input type="number" name="minute" placeholder="Minute (0-59)" min="0" max="59" required></div>
+    </div>
+
+    <label>Place of birth</label>
+    <input type="text" name="place" placeholder="City, State, Country" required>
+
+    <button type="submit">Get My Free Preview</button>
+  </form>
+  <p class="muted">We use your birth time and place to calculate planetary positions using the Swiss Ephemeris and the Lahiri ayanamsa, the standard basis for Vedic (sidereal) astrology.</p>
+{% endblock %}
