@@ -1,0 +1,22 @@
+# Environment and secrets
+.env
+*.env
+
+# Database
+astro.db
+*.db
+
+# Vector DB
+chroma_db/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+env/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
